@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Greps processes
+#
+# Jeffrey Lau
+# 	created on Sat Apr 05 04:52:35 +0800 2008
+#
+# $Id$
+
+script_name=${0##*/}
+
+ps aux | grep $* | grep -v $script_name | grep -v grep
+
+exit 0
