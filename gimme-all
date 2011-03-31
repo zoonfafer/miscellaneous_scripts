@@ -1,0 +1,63 @@
+#!/bin/bash
+#
+# Update all sources in the specified directory.
+#
+# Note: requires the use of `gimme`.
+#
+# Jeffrey Lau
+# 2010-12-11
+
+
+#=-----------------------------------------------------------------------=#
+# 
+#  Constants
+# 
+#=-----------------------------------------------------------------------=#
+
+N=${0##*/}
+
+
+#=-----------------------------------------------------------------------=#
+# 
+#  functions
+# 
+#=-----------------------------------------------------------------------=#
+
+function show_usage() {
+	echo "usage:  ${N} [<directories_containing_the_source_directories>]"
+	echo "  That's it.  Honestly."
+}
+
+
+#=-----------------------------------------------------------------------=#
+# 
+#  main()
+# 
+#=-----------------------------------------------------------------------=#
+# TODO: parse stuff returned to collect update statistics
+
+if [ $# == 0 ]; then
+	all_pending_dirs=/opt/src
+else
+	all_pending_dirs=${*}
+fi
+
+# register for visited dirs
+visited=()
+
+for pending_dirs in ${all_pending_dirs}; do
+	# echo " *** determining \`${pending_dirs}'... ..."
+	for dir in ${pending_dirs}/*; do
+		# echo " ****** determining \`${dir}'... ..."
+		if [ -d "${dir}" -a -r "${dir}" ]; then
+			echo " --> at \`${dir}':-"
+			pushd "${dir}" 1>/dev/null
+			gimme
+			popd 1>/dev/null
+		else
+			continue
+		fi
+	done
+done
+
+exit 0

@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+# A generic wrapper to get the latest source files from various VCS.
+#
+# Jeffrey Lau
+# 2010-12-11
+
+
+#=-----------------------------------------------------------------------=#
+# 
+#  Constants
+# 
+#=-----------------------------------------------------------------------=#
+
+N=${0##*/}
+
+
+#=-----------------------------------------------------------------------=#
+# 
+#  functions
+# 
+#=-----------------------------------------------------------------------=#
+
+function show_usage() {
+	echo "usage:  ${N}"
+	echo "  That's it.  Honestly."
+}
+
+# Search for .git{,/svn}, .hg, _darcs
+function get_repo_type() {
+	type=''
+	# .git
+	if [ -r .git ]; then
+		if [ -r .git/svn ]; then
+			type=git-svn
+		else
+			type=git
+		fi
+	elif [ -r .hg ]; then
+		type=hg
+	elif [ -r _darcs ]; then
+		type=darcs
+	elif [ -r .bzr ]; then
+		type=bzr
+	fi
+
+	echo "${type}"
+}
+
+# then do the appropriate thing for it.
+function up_it() {
+	type=${1}
+	case ${type} in
+	  git-svn)
+		git svn rebase
+		;;
+	  git)
+		git pull
+		;;
+	  hg)
+		hg update
+		hg merge
+		;;
+	  darcs)
+		# "exec" so that Darcs's interactive stuff will work 
+		# better...
+		# The only cons is that this script can't do anything 
+		# afterwards.
+		exec darcs update
+		;;
+	  *)
+		echo "Error:- Sorry, don't know about that repo type." >&2
+		exit 2
+		;;
+	esac
+}
+
+
+#=-----------------------------------------------------------------------=#
+# 
+#  main()
+# 
+#=-----------------------------------------------------------------------=#
+
+# This script needs no arguments.
+if [ $# != 0 ]; then
+	echo "Error:-  Nice try, but I need no arguments." >&2
+	show_usage
+	exit 1
+fi
+
+up_it `get_repo_type`
+
+exit 0
