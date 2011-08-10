@@ -116,8 +116,8 @@ for i in $LIST; do
 
     # bail if source doesn't exist
     if [[ ! -r $SRC_PATH ]]; then
-	echo "Error: source ain't readable" >&2
-	exit 2
+	echo "Error: source directory \`${SRC_PATH}' ain't readable" >&2
+	continue
     fi
 
     if [[ ! -r "${DST_DIR}/${i}" ]]; then
