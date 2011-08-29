@@ -44,7 +44,7 @@ function create_lnln() {
 	elif [[ ! -L "${ln_path}" ]]; then
 
 	    echo "Error:- something \`${ln_path}' exists already --- cannot create symlink with same name" >&2
-	    exit 2
+	    return 2
 
 	else
 	    # Oh, another symlink exists already!
@@ -60,52 +60,24 @@ function create_lnln() {
 
 	    if [[ "${resolved_dst_dir}" != "${resolved_ln_path}" ]]; then
 		echo "Error:- a different symlink to \`${resolved_ln_path}' exists already --- cannot decide what to do!" >&2
-		exit 2
+		return 2
 	    fi
 	fi
     fi
 }
 
 create_lnln "${SRC_DIR}" "${DST_LN}" "${DST_DIR}"
-create_lnln "${DST_DIR}" "${SRC_LN}" "${SRC_DIR}"
+create_lnln "${DST_DIR}" "${SRC_LN}" "${SRC_DIR}" || exit 2
 
-# TODO: read from a config file or something
-LIST="
-Command-T
-delimitMate
-ensime
-nerdcommenter
-nerdtree
-snipmate-snippets
-snipmate.vim
-syntastic
-taglist.vim
-tlib_vim
-tplugin_vim
-vim-abolish
-vim-addon-mw-utils
-vim-align
-vim-conque
-vim-endwise
-vim-fuzzyfinder
-vim-git
-vim-javascript
-vim-l9
-vim-ragtag
-vim-repeat
-vim-scala.zfp
-vim-simplefold
-vim-space
-vim-sparkup
-vim-surround
-vim-taglist-plus
-vim-textobj-user
-vim-trailing-whitespace
-vim-unimpaired
-vim-vspec
-"
-
-# LIST=""
+# read list from a config file
+CONFIG_FILE=~/.lns
+if [ ! -r "${CONFIG_FILE}" ]; then
+	echo "Error:- cannot read config file from ${CONFIG_FILE}" >&2
+	echo "     :  It should be a list of path names separated by newlines." >&2
+	exit 2
+else
+	LIST="`cat ${CONFIG_FILE}`"
+fi
 
 # CREATION
 # TODO: use the dot LNs.
